@@ -31,8 +31,8 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
       style={
         Object.assign({
           position: (centerX || centerY) ? 'absolute' : 'relative',
-          top: `calc(${centerY} - 2 * ${radius} / 2)`,
-          left: `calc(${centerX} - 2 * ${radius} / 2)`,
+          top: `calc(${centerY}px - ${radius})`,
+          left: `calc(${centerX}px - ${radius})`,
         }, styles.container)
       }
     >
