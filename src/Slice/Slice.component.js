@@ -11,7 +11,7 @@ type Props = {
   focusStyle: {},
   contentContainerStyle: {},
   contentStyle: {},
-  contentHeight: string,
+  contentHeight: number,
   onSelect: Callback,
   onMouseUp: Callback,
   onMouseOver: Callback
@@ -23,8 +23,8 @@ type State = {
 
 export default class Slice extends React.Component<Props, State> {
   static defaultProps = {
-    contentHeight: '2em',
-  }
+    contentHeight: 32,
+  };
 
   constructor(props: Props) {
     super(props);
@@ -40,7 +40,7 @@ export default class Slice extends React.Component<Props, State> {
     }
     this.setState({ focused: true });
     event.stopPropagation();
-  }
+  };
 
   onMouseOut = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     const { onMouseUp } = this.props;
@@ -49,7 +49,7 @@ export default class Slice extends React.Component<Props, State> {
     }
     this.setState({ focused: false });
     event.stopPropagation();
-  }
+  };
 
   render() {
     const {
@@ -62,15 +62,15 @@ export default class Slice extends React.Component<Props, State> {
       contentHeight,
     } = this.props;
     const { focused } = this.state;
-    const { background, ...rest } = Object.assign({}, focusStyle);
+    const { background, ...focusedStyle } = Object.assign({}, focusStyle);
     const focusedBgStyle = { background };
-    const focusedStyle = rest;
     return (
       <div
         role="button"
         onMouseOver={this.onMouseOver}
         onMouseOut={this.onMouseOut}
         onMouseUp={onSelect}
+        onClick={e => e.stopPropagation()}
         onFocus={() => {}}
         onBlur={() => {}}
         tabIndex={-1}
@@ -79,7 +79,7 @@ export default class Slice extends React.Component<Props, State> {
         <div style={focused ? Object.assign({}, styles.focus, focusedBgStyle) : {}}>
           <div
             style={Object.assign({
-              height: contentHeight,
+              height: `${contentHeight}px`,
             }, styles.contentContainer, contentContainerStyle)}
           >
             <div style={Object.assign(

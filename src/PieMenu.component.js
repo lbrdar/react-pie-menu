@@ -5,21 +5,25 @@ import styles from './PieMenu.style';
 
 type Props = {
   children: any,
-  radius: string,
-  centerX: string,
-  centerY: string,
-  centerRadius: string,
+  radius: number,
+  centerX: number,
+  centerY: number,
+  centerRadius: number,
   centerStyle: {},
-  contentHeight: string,
+  menuStyle: {},
+  contentHeight: number,
+  renderCenter: boolean
 };
 
 const PieMenu = ({ // eslint-disable-line object-curly-newline
-  radius = '150px',
+  renderCenter = true,
+  radius = 150,
   centerX,
   centerY,
-  centerRadius = '50px',
-  centerStyle,
-  contentHeight = '2em',
+  centerRadius = 50,
+  centerStyle = {},
+  menuStyle = {},
+  contentHeight = 32,
   children,
 }: Props) => {
   const centralAngle = children.length ? 360 / children.length : 360;
@@ -31,15 +35,15 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
       style={
         Object.assign({
           position: (centerX || centerY) ? 'absolute' : 'relative',
-          top: `calc(${centerY}px - ${radius})`,
-          left: `calc(${centerX}px - ${radius})`,
-        }, styles.container)
+          top: `${centerY - radius}px`,
+          left: `${centerX - radius}px`,
+        }, styles.container, menuStyle)
       }
     >
       <nav style={styles.nav}>
         <ul style={Object.assign({
-            width: `calc(2 * ${radius})`,
-            height: `calc(2 * ${radius})`,
+            width: `${2 * radius}px`,
+            height: `${2 * radius}px`,
           }, styles.ul)}
         >
           {React.Children.map(children, (child, i) => {
@@ -48,15 +52,15 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
             const newChild = React.cloneElement(child, {
               containerStyle: Object.assign({
                 transform: `skew(${-skew}deg) rotate(${((polar ? 90 : centralAngle) / 2) - 90}deg)`,
-                background: `radial-gradient(transparent ${centerRadius}, rgba(109, 109, 109, 0.925) ${centerRadius})`,
+                background: `radial-gradient(transparent ${centerRadius}px, rgba(109, 109, 109, 0.925) ${centerRadius}px)`,
               }, child.props.containerStyle),
               focusStyle: Object.assign({
-                background: `radial-gradient(transparent ${centerRadius}, #424242 ${centerRadius})`,
+                background: `radial-gradient(transparent ${centerRadius}px, #424242 ${centerRadius}px)`,
                 color: 'white',
               }, child.props.focusStyle),
               contentHeight: child.props.contentHeight || contentHeight,
               contentContainerStyle: Object.assign({
-                top: `calc((${radius} - ${centerRadius}) / 2 - ${child.props.contentHeight || contentHeight || 0} / 2)`,
+                top: `${((radius - centerRadius) / 2) - ((child.props.contentHeight || contentHeight || 0) / 2)}px`,
               }, child.props.contentContainerStyle),
               contentStyle: Object.assign({
                 transform: `rotate(${-centralAngle * i}deg)`,
@@ -73,15 +77,16 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
             );
           })}
         </ul>
-        <div style={
+        { renderCenter && <div style={
           Object.assign({
-            top: `calc(50% - ${centerRadius})`,
-            left: `calc(50% - ${centerRadius})`,
-            width: `calc(2 * ${centerRadius})`,
-            height: `calc(2 * ${centerRadius})`,
+            top: `calc(50% - ${centerRadius}px)`,
+            left: `calc(50% - ${centerRadius}px)`,
+            width: `calc(2 * ${centerRadius}px)`,
+            height: `calc(2 * ${centerRadius}px)`,
           }, styles.center, centerStyle)
         }
         />
+        }
       </nav>
     </div>
   );
