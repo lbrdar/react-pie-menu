@@ -166,6 +166,8 @@ var Slice = function (_React$Component) {
           onClick: function onClick(e) {
             return e.stopPropagation();
           },
+          onFocus: function onFocus() {},
+          onBlur: function onBlur() {},
           tabIndex: -1,
           style: Object.assign({}, styles.container, containerStyle)
         },
@@ -231,6 +233,7 @@ var styles$1 = {
   center: center
 };
 
+/* eslint-disable no-param-reassign */
 var PieMenu = function PieMenu(_ref) {
   var _ref$renderCenter = _ref.renderCenter,
       renderCenter = _ref$renderCenter === undefined ? true : _ref$renderCenter,
@@ -246,12 +249,21 @@ var PieMenu = function PieMenu(_ref) {
       menuStyle = _ref$menuStyle === undefined ? {} : _ref$menuStyle,
       _ref$contentHeight = _ref.contentHeight,
       contentHeight = _ref$contentHeight === undefined ? 32 : _ref$contentHeight,
+      startAngle = _ref.startAngle,
+      _ref$spreadAngle = _ref.spreadAngle,
+      spreadAngle = _ref$spreadAngle === undefined ? 360 : _ref$spreadAngle,
       children = _ref.children;
 
-  var centralAngle = children.length ? 360 / children.length : 360;
+  var centralAngle = children.length ? spreadAngle / children.length : spreadAngle;
   var deltaAngle = 90 - centralAngle;
-  var startAngle = deltaAngle < 0 ? 45 : deltaAngle + centralAngle / 2;
-  var polar = centralAngle % 180 === 0;
+  var offset = 0;
+  if (startAngle === undefined) {
+    startAngle = deltaAngle < 0 ? 45 : deltaAngle + centralAngle / 2;
+  } else {
+    offset = startAngle - (deltaAngle + centralAngle / 2);
+  }
+
+  console.log(startAngle, centralAngle, deltaAngle, spreadAngle);
   return React.createElement(
     'div',
     {
@@ -273,10 +285,9 @@ var PieMenu = function PieMenu(_ref) {
         },
         React.Children.map(children, function (child, i) {
           var rotate = startAngle + centralAngle * i;
-          var skew = polar ? 0 : deltaAngle;
           var newChild = React.cloneElement(child, {
             containerStyle: Object.assign({
-              transform: 'skew(' + -skew + 'deg) rotate(' + ((polar ? 90 : centralAngle) / 2 - 90) + 'deg)',
+              transform: 'skew(' + -deltaAngle + 'deg) rotate(' + (centralAngle / 2 - 90) + 'deg)',
               background: 'radial-gradient(transparent ' + centerRadius + 'px, rgba(109, 109, 109, 0.925) ' + centerRadius + 'px)'
             }, child.props.containerStyle),
             focusStyle: Object.assign({
@@ -288,14 +299,14 @@ var PieMenu = function PieMenu(_ref) {
               top: (radius - centerRadius) / 2 - (child.props.contentHeight || contentHeight || 0) / 2 + 'px'
             }, child.props.contentContainerStyle),
             contentStyle: Object.assign({
-              transform: 'rotate(' + -centralAngle * i + 'deg)',
+              transform: 'rotate(' + -(offset + centralAngle * i) + 'deg)',
               color: 'black'
             }, child.props.contentStyle)
           });
           return React.createElement(
             'li',
             { style: Object.assign({
-                transform: 'rotate(' + rotate + 'deg) skew(' + skew + 'deg)'
+                transform: 'rotate(' + rotate + 'deg) skew(' + deltaAngle + 'deg)'
               }, styles$1.li)
             },
             newChild

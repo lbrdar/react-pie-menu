@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable no-param-reassign */
 import React from 'react';
 
 import styles from './PieMenu.style';
@@ -12,7 +13,9 @@ type Props = {
   centerStyle: {},
   menuStyle: {},
   contentHeight: number,
-  renderCenter: boolean
+  renderCenter: boolean,
+  startAngle: number,
+  spreadAngle: number
 };
 
 const PieMenu = ({ // eslint-disable-line object-curly-newline
@@ -24,12 +27,20 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
   centerStyle = {},
   menuStyle = {},
   contentHeight = 32,
+  startAngle,
+  spreadAngle = 360,
   children,
 }: Props) => {
-  const centralAngle = children.length ? 360 / children.length : 360;
+  const centralAngle = children.length ? spreadAngle / children.length : spreadAngle;
   const deltaAngle = 90 - centralAngle;
-  const startAngle = deltaAngle < 0 ? 45 : deltaAngle + (centralAngle / 2);
-  const polar = centralAngle % 180 === 0;
+  let offset = 0;
+  if (startAngle === undefined) {
+    startAngle = deltaAngle < 0 ? 45 : deltaAngle + (centralAngle / 2);
+  } else {
+    offset = startAngle - (deltaAngle + (centralAngle / 2));
+  }
+
+  console.log(startAngle, centralAngle, deltaAngle, spreadAngle);
   return (
     <div
       style={
@@ -48,10 +59,9 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
         >
           {React.Children.map(children, (child, i) => {
             const rotate = startAngle + (centralAngle * i);
-            const skew = polar ? 0 : deltaAngle;
             const newChild = React.cloneElement(child, {
               containerStyle: Object.assign({
-                transform: `skew(${-skew}deg) rotate(${((polar ? 90 : centralAngle) / 2) - 90}deg)`,
+                transform: `skew(${-deltaAngle}deg) rotate(${(centralAngle / 2) - 90}deg)`,
                 background: `radial-gradient(transparent ${centerRadius}px, rgba(109, 109, 109, 0.925) ${centerRadius}px)`,
               }, child.props.containerStyle),
               focusStyle: Object.assign({
@@ -63,13 +73,13 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
                 top: `${((radius - centerRadius) / 2) - ((child.props.contentHeight || contentHeight || 0) / 2)}px`,
               }, child.props.contentContainerStyle),
               contentStyle: Object.assign({
-                transform: `rotate(${-centralAngle * i}deg)`,
+                transform: `rotate(${-(offset + centralAngle * i)}deg)`,
                 color: 'black',
               }, child.props.contentStyle),
             });
             return (
               <li style={Object.assign({
-                transform: `rotate(${rotate}deg) skew(${skew}deg)`,
+                transform: `rotate(${rotate}deg) skew(${deltaAngle}deg)`,
               }, styles.li)}
               >
                 {newChild}
