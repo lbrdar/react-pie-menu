@@ -37,10 +37,9 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
   if (startAngle === undefined) {
     startAngle = deltaAngle < 0 ? 45 : deltaAngle + (centralAngle / 2);
   } else {
-    offset = startAngle - (deltaAngle + (centralAngle / 2));
+    offset = startAngle - (deltaAngle < 0 ? 45 : deltaAngle + (centralAngle / 2));
   }
-
-  console.log(startAngle, centralAngle, deltaAngle, spreadAngle);
+  const polar = centralAngle % 180 === 0;
   return (
     <div
       style={
@@ -59,9 +58,10 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
         >
           {React.Children.map(children, (child, i) => {
             const rotate = startAngle + (centralAngle * i);
+            const skew = polar ? 0 : deltaAngle;
             const newChild = React.cloneElement(child, {
               containerStyle: Object.assign({
-                transform: `skew(${-deltaAngle}deg) rotate(${(centralAngle / 2) - 90}deg)`,
+                transform: `skew(${-skew}deg) rotate(${((polar ? 90 : centralAngle) / 2) - 90}deg)`,
                 background: `radial-gradient(transparent ${centerRadius}px, rgba(109, 109, 109, 0.925) ${centerRadius}px)`,
               }, child.props.containerStyle),
               focusStyle: Object.assign({
@@ -79,7 +79,7 @@ const PieMenu = ({ // eslint-disable-line object-curly-newline
             });
             return (
               <li style={Object.assign({
-                transform: `rotate(${rotate}deg) skew(${deltaAngle}deg)`,
+                transform: `rotate(${rotate}deg) skew(${skew}deg)`,
               }, styles.li)}
               >
                 {newChild}

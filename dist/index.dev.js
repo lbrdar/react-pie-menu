@@ -260,10 +260,9 @@ var PieMenu = function PieMenu(_ref) {
   if (startAngle === undefined) {
     startAngle = deltaAngle < 0 ? 45 : deltaAngle + centralAngle / 2;
   } else {
-    offset = startAngle - (deltaAngle + centralAngle / 2);
+    offset = startAngle - (deltaAngle < 0 ? 45 : deltaAngle + centralAngle / 2);
   }
-
-  console.log(startAngle, centralAngle, deltaAngle, spreadAngle);
+  var polar = centralAngle % 180 === 0;
   return React.createElement(
     'div',
     {
@@ -285,9 +284,10 @@ var PieMenu = function PieMenu(_ref) {
         },
         React.Children.map(children, function (child, i) {
           var rotate = startAngle + centralAngle * i;
+          var skew = polar ? 0 : deltaAngle;
           var newChild = React.cloneElement(child, {
             containerStyle: Object.assign({
-              transform: 'skew(' + -deltaAngle + 'deg) rotate(' + (centralAngle / 2 - 90) + 'deg)',
+              transform: 'skew(' + -skew + 'deg) rotate(' + ((polar ? 90 : centralAngle) / 2 - 90) + 'deg)',
               background: 'radial-gradient(transparent ' + centerRadius + 'px, rgba(109, 109, 109, 0.925) ' + centerRadius + 'px)'
             }, child.props.containerStyle),
             focusStyle: Object.assign({
@@ -306,7 +306,7 @@ var PieMenu = function PieMenu(_ref) {
           return React.createElement(
             'li',
             { style: Object.assign({
-                transform: 'rotate(' + rotate + 'deg) skew(' + deltaAngle + 'deg)'
+                transform: 'rotate(' + rotate + 'deg) skew(' + skew + 'deg)'
               }, styles$1.li)
             },
             newChild
